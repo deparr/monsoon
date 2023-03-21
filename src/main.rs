@@ -38,7 +38,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let uri = Uri::builder()
         .scheme("https")
         .authority("api.openweathermap.org")
-        .path_and_query("/data/2.5/weather?lat=40.24&lon=-111.65&units=imperial&appid=667d14fa6655b4835c731f0e0257b3a0")
         .build()
         .expect("failed to parse");
     let mut resp = client.get(uri).await?;
