@@ -2,19 +2,17 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
 
-use hyper::{ Client, Uri };
-use hyper_tls::HttpsConnector;
 use hyper::body::HttpBody as _;
+use hyper::{Client, Uri};
+use hyper_tls::HttpsConnector;
 use tokio::io::{stdout, AsyncWriteExt as _};
-
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-
     let uri = "/data/2.5/weather?lat=40.24&lon=-111.65&units=imperial&appid=__KEY__";
     // TODO: get key and lat/lon from config file
     // (maybe all api params?)
-    
+
     let path = Path::new("./key");
     let mut file = match File::open(&path) {
         Ok(file) => file,
@@ -28,8 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     }
 
     let https = HttpsConnector::new();
-    let client = Client::builder()
-        .build::<_, hyper::Body>(https);
+    let client = Client::builder().build::<_, hyper::Body>(https);
     let uri = Uri::builder()
         .scheme("https")
         .authority("api.openweathermap.org")
@@ -43,5 +40,5 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         stdout().write_all(&chunk?).await?;
     }
 
-   Ok(()) 
+    Ok(())
 }
