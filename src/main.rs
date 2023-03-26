@@ -2,10 +2,9 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
 
-use hyper::body::HttpBody as _;
 use hyper::{Client, Uri};
 use hyper_tls::HttpsConnector;
-use tokio::io::{stdout, AsyncWriteExt as _};
+use serde_json::Value;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
@@ -33,12 +32,37 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         .path_and_query(uri.replace("__KEY__", key.trim_end()))
         .build()
         .expect("failed to parse");
-    let mut resp = client.get(uri).await?;
-    println!("Response: {}", resp.status());
 
+    /*
     while let Some(chunk) = resp.body_mut().data().await {
         stdout().write_all(&chunk?).await?;
-    }
+    }*/
 
+    let resp = client.get(uri).await?;
+    println!("Response: {}", resp.status());
+    let resp = String::from_utf8(
+        hyper::body::to_bytes(resp.into_body())
+            .await?
+            .into_iter()
+            .collect(),
+    )
+    .unwrap();
+
+    //println!("Body: {}", resp);
+
+    let json: Value = match serde_json::from_str(resp.as_str()) {
+        Ok(v) => v,
+        Err(err) => panic!("unable to deserialize: {err}"),
+    };
+
+    let json = match json.as_object() {
+        Some(obj) => obj,
+        None => panic!("unable to read map of res"),
+    };
+
+    let weather = json.get("weather");
+    let main = json.get("main");
+
+    println!("\n\n{:#?}\n\n{:#?}", main, weather);
     Ok(())
 }
