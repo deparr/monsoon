@@ -6,9 +6,21 @@ use hyper::{Client, Uri};
 use hyper_tls::HttpsConnector;
 use serde_json::Value;
 
+
+struct TempData {
+    temp: f64,
+    feels_like: f64,
+}
+
+struct WeatherData {
+    description: String,
+    main: String
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let uri = "/data/2.5/weather?lat=40.24&lon=-111.65&units=imperial&appid=__KEY__";
+    let outstr = "__TEMP__°__TEMP_UNIT__ | __DESCRIPTION__";
     // TODO: get key and lat/lon from config file
     // (maybe all api params?)
 
@@ -54,15 +66,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         Ok(v) => v,
         Err(err) => panic!("unable to deserialize: {err}"),
     };
-
+    /*
     let json = match json.as_object() {
         Some(obj) => obj,
         None => panic!("unable to read map of res"),
-    };
+    };*/
 
-    let weather = json.get("weather");
-    let main = json.get("main");
+    //let basic = serde_json::de:: (json.get("main"));
 
-    println!("\n\n{:#?}\n\n{:#?}", main, weather);
+    //let basic = json.get("main").unwrap_or(&serde_json::from_str(r#"{"temp": "none"}"#).unwrap());
+    //let weather = json.get("weather");
+
+    //let final_outstr = outstr.replace("__TEMP__", );
+
+    println!("\n\n{:#?}\n\n", json);
     Ok(())
 }
