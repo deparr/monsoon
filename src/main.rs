@@ -1,9 +1,9 @@
 use std::fs::File;
-use std::io::prelude::*;
 use std::path::Path;
 
 use hyper::{Client, Uri};
 use hyper_tls::HttpsConnector;
+use serde::Deserialize;
 use serde_json::Value;
 
 
@@ -17,31 +17,43 @@ struct WeatherData {
     main: String
 }
 
+#[derive(Deserialize, Debug)]
+struct Config {
+    key: String,
+    lat: String,
+    lon: String,
+    units: String
+}
+
+const URI: &str = "/data/2.5/weather?lat=__LAT__&lon=__LON__&units=__UNITS__&appid=__KEY__";
+const AUTHORITY: &str = "api.openweathermap.org";
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let uri = "/data/2.5/weather?lat=40.24&lon=-111.65&units=imperial&appid=__KEY__";
-    let outstr = "__TEMP__°__TEMP_UNIT__ | __DESCRIPTION__";
+    let _outstr = "__TEMP__°__TEMP_UNIT__ | __DESCRIPTION__";
     // TODO: get key and lat/lon from config file
     // (maybe all api params?)
 
-    let path = Path::new("./key");
-    let mut file = match File::open(&path) {
+
+    let path = Path::new("./config.json");
+    let file = match File::open(&path) {
         Ok(file) => file,
         Err(err) => panic!("unable to open file: {err}"),
     };
 
-    let mut key = String::new();
-    match file.read_to_string(&mut key) {
-        Ok(_) => (),
-        Err(err) => panic!("unable to read key file: {err}"),
-    }
+    let config: Config = serde_json::from_reader(file)?;
+    println!("{:#?}", config);
+
 
     let https = HttpsConnector::new();
     let client = Client::builder().build::<_, hyper::Body>(https);
     let uri = Uri::builder()
         .scheme("https")
-        .authority("api.openweathermap.org")
-        .path_and_query(uri.replace("__KEY__", key.trim_end()))
+        .authority(AUTHORITY)
+        .path_and_query(URI.replace("__LAT__", &config.lat)
+                            .replace("__LON__", &config.lon)
+                            .replace("__UNITS__", &config.units)
+                            .replace("__KEY__", &config.key))
         .build()
         .expect("failed to parse");
 
@@ -62,23 +74,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     //println!("Body: {}", resp);
 
-    let json: Value = match serde_json::from_str(resp.as_str()) {
-        Ok(v) => v,
-        Err(err) => panic!("unable to deserialize: {err}"),
-    };
-    /*
-    let json = match json.as_object() {
-        Some(obj) => obj,
-        None => panic!("unable to read map of res"),
-    };*/
+    let full_json: Value = serde_json::from_str(resp.as_str())?;
 
     //let basic = serde_json::de:: (json.get("main"));
 
     //let basic = json.get("main").unwrap_or(&serde_json::from_str(r#"{"temp": "none"}"#).unwrap());
     //let weather = json.get("weather");
 
-    //let final_outstr = outstr.replace("__TEMP__", );
 
-    println!("\n\n{:#?}\n\n", json);
+    println!("\n\n{:#?}\n\n", full_json);
     Ok(())
 }
