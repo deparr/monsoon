@@ -35,4 +35,4 @@ Currently supported keys:
 
 `units`, the unit of measurement returned by the api, can be `"metric"`, `"imperial"`, or `"default"` (Celsius, Fahrenheit, and Kelvin respectively).
 
-See the [docs](https://openweathermap.org/current) for more info.
+See the [api docs](https://openweathermap.org/current) for more info.
