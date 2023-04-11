@@ -1,7 +1,7 @@
 # monsoon :cyclone: 
 A cli weather fetcher
 
-**:rotating_light: this is terribly inefficient and mostly just for my personal use :rotating_light:**
+**:rotating_light: this is terribly inefficient and mostly intended for my personal use :rotating_light:**
 
 ---
 
