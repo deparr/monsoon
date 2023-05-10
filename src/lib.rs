@@ -131,7 +131,6 @@ pub async fn run() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             writeln!(log, "{}° | {}", temp, desc)?;
 
             // probably unnecessary,
-            // should make sure this isn't leaking via hashmap
             drop(full_json);
         }
     });
