@@ -7,7 +7,7 @@ A cli weather fetcher
 
 A program that fetches the current weather using [OpenWeather API](https://openweathermap.org/api). I'm sure something like this already exists, I just wanted an excuse to write a (terrible) Rust program.
 
-Right now it only has the very specific functionality of updating a `listen` variable for my [eww](https://github.com/elkowar/eww) status bar.
+Right now it only has the very specific functionality of appending the latest data to a log file (which is read by a `listen` variable in my [eww](https://github.com/elkowar/eww) status bar).
 
 ### Configuration
 monsoon expects a config file at either `$XDG_CONFIG_HOME/monsoon/config.json` or `$HOME/.config/monsoon/config.json`.
